@@ -2,6 +2,42 @@
 
 A complete, production-ready agent-based system that generates comprehensive, book-quality notes on any topic and compiles them into professional PDF documents.
 
+## 📚 Project Documentation
+
+This project contains extensive documentation to help you understand, use, and extend the system:
+
+### 🚀 Getting Started
+- **[START_HERE.md](START_HERE.md)**: The best place to start for new users.
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)**: Handy cheat sheet for common commands and shortcuts.
+- **[USAGE_GUIDE.md](USAGE_GUIDE.md)**: Detailed step-by-step instructions for all features.
+
+### 📖 System Overview
+- **[PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)**: High-level vision and capabilities of the system.
+- **[ARCHITECTURE.md](ARCHITECTURE.md)**: Deep dive into the agentic architecture and technical design.
+- **[APPLICATION_STATUS.md](APPLICATION_STATUS.md)**: Current operational status and functional verification.
+- **[STATUS.md](STATUS.md)**: Brief project status update.
+
+### 🌐 Web Interface
+- **[WEB_README.md](WEB_README.md)**: Guide for the web-based version of the application.
+- **[WEB_INTERFACE.md](WEB_INTERFACE.md)**: Details on the web UI components and features.
+- **[COMPLETE_WEB_GUIDE.md](COMPLETE_WEB_GUIDE.md)**: Comprehensive guide for web deployment and usage.
+
+### 🛠️ Development & Reference
+- **[PROMPTS.md](PROMPTS.md)**: The system prompts that power the individual AI agents.
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Guidelines for contributing to the project.
+- **[CHANGELOG.md](CHANGELOG.md)**: History of changes and updates.
+
+### 📊 Summaries
+- **[COMPLETE_PROJECT_SUMMARY.md](COMPLETE_PROJECT_SUMMARY.md)**: Full summary of the project's development.
+- **[FINAL_SUMMARY.md](FINAL_SUMMARY.md)**: Conclusion of the development phase.
+- **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)**: Concise project abstract.
+
+### 🎓 Specialized Guides
+- **[STUDENT_APP_GUIDE.md](STUDENT_APP_GUIDE.md)**: Specific guide for using the app for academic purposes.
+- **[ULTIMATE_README.md](ULTIMATE_README.md)**: An alternative, detailed comprehensive readme.
+
+---
+
 ## Features
 
 - **Multi-Model Support**: Works with Ollama (local), Google Gemini, and Mistral AI
@@ -154,7 +190,7 @@ For each node in the outline:
 - **Reviewer** evaluates quality and completeness
 - **Author** polishes into book-quality prose
 - **Tracker** updates progress and memory
-- Content is saved to disk incrementally
+- **Content is saved to disk incrementally**
 
 ### 3. Completion Judgment
 The Completion Judge evaluates:
