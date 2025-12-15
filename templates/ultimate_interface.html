@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate AI Notes Generator - Profile-Based System</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --bg-light: #f9fafb;
+            --bg-white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: var(--bg-white);
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .header-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 40px;
+            padding: 40px;
+        }
+        
+        @media (max-width: 1600px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+        
+        .form-section {
+            background: var(--bg-white);
+        }
+        
+        .sidebar {
+            background: var(--bg-light);
+            padding: 30px;
+            border-radius: 16px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-size: 1.1em;
+        }
+        
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .profile-card {
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-white);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--profile-color, var(--primary));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .profile-card:hover::before,
+        .profile-card.selected::before {
+            transform: scaleX(1);
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            border-color: var(--profile-color, var(--primary));
+        }
+        
+        .profile-card.selected {
+            border-color: var(--profile-color, var(--primary));
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .profile-icon {
+            font-size: 2.5em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--profile-color, var(--primary)) 0%, var(--profile-color, var(--secondary)) 100%);
+            color: white;
+        }
+        
+        .profile-info h3 {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .profile-info p {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        
+        .profile-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .profile-feature {
+            background: var(--bg-light);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .profile-settings {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+        
+        .profile-settings strong {
+            color: var(--text-primary);
+        }
+        
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .provider-card {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-white);
+            position: relative;
+        }
+        
+        .provider-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .provider-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+        }
+        
+        .provider-card.unavailable {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .provider-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .provider-icon {
+            font-size: 1.5em;
+        }
+        
+        .provider-name {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .provider-type {
+            background: #e5e7eb;
+            color: #374151;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+        
+        .provider-type.local {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .provider-type.cloud {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .provider-description {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .provider-recommended {
+            font-size: 0.8em;
+            color: var(--info);
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        
+        .provider-models {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+        
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc2626;
+        }
+        
+        .status-indicator.available {
+            background: var(--success);
+        }
+        
+        .status-indicator.unavailable {
+            background: var(--warning);
+        }
+        
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--bg-white);
+            font-family: inherit;
+        }
+        
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .topic-suggestions {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .topic-suggestion {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .topic-suggestion:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .custom-settings {
+            background: var(--bg-light);
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+        
+        .custom-settings h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2em;
+        }
+        
+        .setting-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .setting-item {
+            background: var(--bg-white);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        .setting-item label {
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .setting-item input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .setting-item input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .setting-description {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-stop {
+            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+            margin-top: 15px;
+        }
+        
+        .btn-stop:hover {
+            box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-white);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9em;
+            border-radius: 8px;
+        }
+        
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .status.active {
+            display: block;
+        }
+        
+        .status.info {
+            background: #e3f2fd;
+            border-left: 4px solid var(--info);
+            color: #0d47a1;
+        }
+        
+        .status.success {
+            background: #e8f5e9;
+            border-left: 4px solid var(--success);
+            color: #1b5e20;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            border-left: 4px solid var(--error);
+            color: #c62828;
+        }
+        
+        .status.warning {
+            background: #fff8e1;
+            border-left: 4px solid var(--warning);
+            color: #e65100;
+        }
+        
+        .progress {
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            width: 0%;
+            transition: width 0.3s;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .download-btn {
+            background: var(--success);
+            margin-top: 15px;
+        }
+        
+        .download-btn:hover {
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section {
+            background: var(--bg-white);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .active-sessions {
+            margin-bottom: 20px;
+        }
+        
+        .session-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9em;
+        }
+        
+        .session-item:last-child {
+            border-bottom: none;
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-topic {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        
+        .session-meta {
+            color: var(--text-secondary);
+            font-size: 0.8em;
+        }
+        
+        .session-progress {
+            width: 60px;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        
+        .session-progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9em;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-topic {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .history-meta {
+            color: var(--text-secondary);
+            font-size: 0.8em;
+        }
+        
+        .no-content {
+            color: var(--text-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .profile-group {
+            margin-bottom: 25px;
+        }
+        
+        .profile-group h4 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        
+        .file-meta {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        
+        .alert.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+        
+        .alert.warning {
+            background: #fffbeb;
+            border: 1px solid #fed7aa;
+            color: #d97706;
+        }
+        
+        .api-keys-form {
+            display: none;
+            margin-top: 15px;
+            padding: 20px;
+            background: var(--bg-white);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .api-keys-form.active {
+            display: block;
+        }
+        
+        .api-key-group {
+            margin-bottom: 20px;
+        }
+        
+        .api-key-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 0.9em;
+        }
+        
+        .api-key-status {
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .api-key-status.configured {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .api-key-status.not-configured {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .api-key-input {
+            position: relative;
+        }
+        
+        .api-key-input input {
+            padding-right: 45px;
+        }
+        
+        .api-key-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+        
+        .api-key-toggle:hover {
+            color: var(--primary);
+        }
+        
+        .api-key-description {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+        
+        .api-key-link {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .api-key-link:hover {
+            text-decoration: underline;
+        }
+        
+        .resume-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .resume-section.active {
+            display: block;
+        }
+        
+        .resume-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #d97706;
+        }
+        
+        .resume-info {
+            font-size: 0.9em;
+            color: #92400e;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-brain"></i> Ultimate AI Notes Generator</h1>
+                <p>Profile-based AI note generation with advanced features and resume capability</p>
+                
+                <div class="header-badges">
+                    <div class="badge"><i class="fas fa-user-cog"></i> Profile-Based</div>
+                    <div class="badge"><i class="fas fa-stop"></i> Stop Anytime</div>
+                    <div class="badge"><i class="fas fa-redo"></i> Resume Failed</div>
+                    <div class="badge"><i class="fas fa-key"></i> API Management</div>
+                    <div class="badge"><i class="fas fa-download"></i> PDF Export</div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-number" id="availableProfiles">8</span>
+                        <span class="stat-label">Generation Profiles</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="availableProviders">-</span>
+                        <span class="stat-label">AI Providers</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="totalModels">-</span>
+                        <span class="stat-label">AI Models</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="generationHistory">0</span>
+                        <span class="stat-label">Notes Created</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <form id="generateForm">
+                    <div class="resume-section" id="resumeSection">
+                        <div class="resume-header">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Previous Generation Failed</strong>
+                        </div>
+                        <div id="resumeInfo" class="resume-info"></div>
+                        <button type="button" class="btn btn-secondary" id="resumeBtn" onclick="resumeGeneration()">
+                            <i class="fas fa-play"></i> Continue from Previous State
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-user-graduate"></i> Choose Generation Profile</label>
+                        <div class="profile-grid" id="profileGrid">
+                            <div style="text-align: center; padding: 40px; color: #666;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 2em; margin-bottom: 10px;"></i>
+                                <p>Loading generation profiles...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-server"></i> Choose AI Provider</label>
+                        <div class="provider-grid" id="providerGrid">
+                            <div style="text-align: center; padding: 40px; color: #666;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 2em; margin-bottom: 10px;"></i>
+                                <p>Loading AI providers...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="modelGroup" style="display: none;">
+                        <label><i class="fas fa-robot"></i> Select Model</label>
+                        <select id="model" required>
+                            <option value="">Select a model</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-lightbulb"></i> What do you want to learn about?</label>
+                        <textarea id="topic" rows="3" placeholder="e.g., Machine Learning Fundamentals, World War II Analysis, Advanced Calculus" required></textarea>
+                        <div class="topic-suggestions" id="topicSuggestions">
+                            <!-- Topic suggestions will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="custom-settings">
+                        <h3><i class="fas fa-sliders-h"></i> Custom Settings (Optional)</h3>
+                        <p style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 20px;">
+                            Override profile defaults if needed. Leave blank to use profile settings.
+                        </p>
+                        <div class="setting-row">
+                            <div class="setting-item">
+                                <label for="maxDepth">Content Depth</label>
+                                <input type="number" id="maxDepth" placeholder="Auto" min="2" max="5">
+                                <div class="setting-description">How detailed (2-5 levels)</div>
+                            </div>
+                            <div class="setting-item">
+                                <label for="minLength">Section Length</label>
+                                <input type="number" id="minLength" placeholder="Auto" min="100" max="1000" step="50">
+                                <div class="setting-description">Words per section</div>
+                            </div>
+                            <div class="setting-item">
+                                <label for="maxIterations">Quality Level</label>
+                                <input type="number" id="maxIterations" placeholder="Auto" min="10" max="200" step="10">
+                                <div class="setting-description">Processing cycles</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="generateBtn">
+                        <i class="fas fa-rocket"></i> Generate Professional Notes
+                    </button>
+                    
+                    <button type="button" class="btn btn-stop" id="stopBtn" style="display: none;">
+                        <i class="fas fa-stop"></i> Stop Generation
+                    </button>
+                </form>
+                
+                <div class="status" id="status">
+                    <div id="statusMessage"></div>
+                    <div class="progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="section">
+                    <h3><i class="fas fa-key"></i> API Keys</h3>
+                    <div id="apiKeysSection">
+                        <p class="no-content">Loading API key status...</p>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="toggleApiKeys()" style="margin-top: 15px; width: 100%;">
+                        <i class="fas fa-cog"></i> <span id="apiToggleText">Manage API Keys</span>
+                    </button>
+                    
+                    <div class="api-keys-form" id="apiKeysForm">
+                        <!-- API key form will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="section active-sessions">
+                    <h3><i class="fas fa-play-circle"></i> Active Generations</h3>
+                    <div id="activeSessions">
+                        <p class="no-content">No active generations</p>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3><i class="fas fa-history"></i> Recent Notes</h3>
+                    <div id="historyList">
+                        <p class="no-content">No notes generated yet</p>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3><i class="fas fa-folder-open"></i> Generated Files</h3>
+                    <div id="filesList">
+                        <p class="no-content">No files yet</p>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="refreshFiles()" style="margin-top: 15px; width: 100%;">
+                        <i class="fas fa-refresh"></i> Refresh Files
+                    </button>
+                </div>
+                
+                <div class="section">
+                    <h3><i class="fas fa-info-circle"></i> How it Works</h3>
+                    <div style="font-size: 0.9em; color: var(--text-secondary); line-height: 1.5;">
+                        <p><strong>1. Choose Profile:</strong> Select generation style (Student, Professional, Research, etc.)</p>
+                        <p><strong>2. Select AI Provider:</strong> Local (Ollama, LM Studio) or cloud (Gemini, Mistral)</p>
+                        <p><strong>3. Enter Topic:</strong> Be specific for better results</p>
+                        <p><strong>4. Generate Notes:</strong> Watch real-time progress</p>
+                        <p><strong>5. Download PDF:</strong> Professional study materials</p>
+                        <br>
+                        <p><strong>💡 Pro Tips:</strong></p>
+                        <p>• You can stop generation anytime and still get a PDF</p>
+                        <p>• Failed generations can be resumed from where they left off</p>
+                        <p>• Each profile optimizes content for different use cases</p>
+                        <p>• Files are organized by profile and topic automatically</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const socket = io();
+        let profiles = {};
+        let providers = [];
+        let selectedProfile = null;
+        let selectedProvider = null;
+        let generationHistory = [];
+        let currentSessionId = null;
+        let activeSessions = {};
+        
+        // Initialize app
+        async function initializeApp() {
+            await loadProfiles();
+            await loadProviders();
+            await loadApiKeys();
+            await loadHistory();
+            await loadFiles();
+            await loadActiveSessions();
+            await checkResumable();
+            setupFormValidation();
+            
+            // Refresh active sessions every 5 seconds
+            setInterval(loadActiveSessions, 5000);
+        }
+        
+        // Load generation profiles
+        async function loadProfiles() {
+            try {
+                const response = await fetch('/api/profiles');
+                const data = await response.json();
+                profiles = data.profiles;
+                renderProfiles();
+            } catch (error) {
+                console.error('Failed to load profiles:', error);
+            }
+        }
+        
+        // Render generation profiles
+        function renderProfiles() {
+            const container = document.getElementById('profileGrid');
+            container.innerHTML = '';
+            
+            Object.entries(profiles).forEach(([key, profile]) => {
+                const card = document.createElement('div');
+                card.className = 'profile-card';
+                card.dataset.profileId = key;
+                card.style.setProperty('--profile-color', profile.color);
+                
+                card.innerHTML = `
+                    <div class="profile-header">
+                        <div class="profile-icon">${profile.icon}</div>
+                        <div class="profile-info">
+                            <h3>${profile.name}</h3>
+                            <p>${profile.description}</p>
+                        </div>
+                    </div>
+                    <div class="profile-features">
+                        ${profile.features.map(feature => `<span class="profile-feature">${feature}</span>`).join('')}
+                    </div>
+                    <div class="profile-settings">
+                        <strong>Settings:</strong> 
+                        Depth: ${profile.settings.max_depth}, 
+                        Length: ${profile.settings.min_section_length}, 
+                        Quality: ${profile.settings.max_iterations}
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => selectProfile(key, profile));
+                container.appendChild(card);
+            });
+        }
+        
+        // Select generation profile
+        function selectProfile(profileId, profile) {
+            // Remove previous selection
+            document.querySelectorAll('.profile-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select new profile
+            const card = document.querySelector(`[data-profile-id="${profileId}"]`);
+            card.classList.add('selected');
+            
+            selectedProfile = { id: profileId, ...profile };
+            
+            // Update topic suggestions
+            updateTopicSuggestions(profile.topics);
+        }
+        
+        // Update topic suggestions
+        function updateTopicSuggestions(topics) {
+            const container = document.getElementById('topicSuggestions');
+            container.innerHTML = '';
+            
+            topics.forEach(topic => {
+                const suggestion = document.createElement('div');
+                suggestion.className = 'topic-suggestion';
+                suggestion.textContent = topic;
+                suggestion.addEventListener('click', () => {
+                    document.getElementById('topic').value = topic;
+                });
+                container.appendChild(suggestion);
+            });
+        }
+        
+        // Load providers
+        async function loadProviders() {
+            try {
+                const response = await fetch('/api/providers');
+                const data = await response.json();
+                providers = data.providers;
+                
+                // Update stats
+                document.getElementById('availableProviders').textContent = data.available_count;
+                document.getElementById('totalModels').textContent = 
+                    providers.reduce((sum, p) => sum + p.models.length, 0);
+                
+                renderProviders();
+            } catch (error) {
+                console.error('Failed to load providers:', error);
+                showError('Failed to load AI providers. Please refresh the page.');
+            }
+        }
+        
+        // Render provider cards
+        function renderProviders() {
+            const grid = document.getElementById('providerGrid');
+            grid.innerHTML = '';
+            
+            if (providers.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No AI providers available. Please check your configuration.</p>';
+                return;
+            }
+            
+            providers.forEach(provider => {
+                const card = document.createElement('div');
+                card.className = `provider-card ${provider.status === 'available' ? '' : 'unavailable'}`;
+                card.dataset.providerId = provider.id;
+                
+                card.innerHTML = `
+                    <div class="status-indicator ${provider.status}"></div>
+                    <div class="provider-header">
+                        <span class="provider-icon">${provider.icon}</span>
+                        <span class="provider-name">${provider.name}</span>
+                        <span class="provider-type ${provider.type}">${provider.type}</span>
+                    </div>
+                    <div class="provider-description">${provider.description}</div>
+                    <div class="provider-recommended">${provider.recommended_for}</div>
+                    <div class="provider-models">${provider.models.length} models available</div>
+                `;
+                
+                if (provider.status === 'available') {
+                    card.addEventListener('click', () => selectProvider(provider));
+                }
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        // Select provider
+        function selectProvider(provider) {
+            // Remove previous selection
+            document.querySelectorAll('.provider-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Select new provider
+            const card = document.querySelector(`[data-provider-id="${provider.id}"]`);
+            card.classList.add('selected');
+            
+            selectedProvider = provider;
+            
+            // Show model selection
+            const modelGroup = document.getElementById('modelGroup');
+            const modelSelect = document.getElementById('model');
+            
+            modelSelect.innerHTML = '<option value="">Select a model</option>';
+            provider.models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+            });
+            
+            modelGroup.style.display = 'block';
+        }
+        
+        // Load API keys status
+        async function loadApiKeys() {
+            try {
+                const response = await fetch('/api/api-keys');
+                const data = await response.json();
+                renderApiKeys(data.keys);
+            } catch (error) {
+                console.error('Failed to load API keys:', error);
+            }
+        }
+        
+        // Render API keys section
+        function renderApiKeys(keys) {
+            const section = document.getElementById('apiKeysSection');
+            
+            section.innerHTML = `
+                <div style="font-size: 0.9em;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <i class="fas fa-google" style="color: #4285f4;"></i>
+                        <span>Google Gemini:</span>
+                        <span class="api-key-status ${keys.gemini.configured ? 'configured' : 'not-configured'}">
+                            ${keys.gemini.configured ? '✓ Configured' : '✗ Not Set'}
+                        </span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <i class="fas fa-bolt" style="color: #ea580c;"></i>
+                        <span>Mistral AI:</span>
+                        <span class="api-key-status ${keys.mistral.configured ? 'configured' : 'not-configured'}">
+                            ${keys.mistral.configured ? '✓ Configured' : '✗ Not Set'}
+                        </span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-home" style="color: #059669;"></i>
+                        <span>Ollama Host:</span>
+                        <span class="api-key-status configured">✓ ${keys.ollama.value}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Render API keys form
+            const form = document.getElementById('apiKeysForm');
+            form.innerHTML = `
+                <div class="api-key-group">
+                    <label>
+                        <i class="fas fa-google" style="color: #4285f4;"></i>
+                        Google Gemini API Key
+                        <span class="api-key-status ${keys.gemini.configured ? 'configured' : 'not-configured'}">
+                            ${keys.gemini.configured ? keys.gemini.masked : 'Not Set'}
+                        </span>
+                    </label>
+                    <div class="api-key-input">
+                        <input type="password" id="geminiKey" placeholder="${keys.gemini.placeholder}" 
+                               value="${keys.gemini.configured ? '••••••••••••••••' : ''}">
+                        <button type="button" class="api-key-toggle" onclick="togglePasswordVisibility('geminiKey')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="api-key-description">
+                        Get your free API key from <a href="https://makersuite.google.com/app/apikey" target="_blank" class="api-key-link">Google AI Studio</a>. 
+                        Free tier includes generous usage limits.
+                    </div>
+                </div>
+                
+                <div class="api-key-group">
+                    <label>
+                        <i class="fas fa-bolt" style="color: #ea580c;"></i>
+                        Mistral AI API Key
+                        <span class="api-key-status ${keys.mistral.configured ? 'configured' : 'not-configured'}">
+                            ${keys.mistral.configured ? keys.mistral.masked : 'Not Set'}
+                        </span>
+                    </label>
+                    <div class="api-key-input">
+                        <input type="password" id="mistralKey" placeholder="${keys.mistral.placeholder}"
+                               value="${keys.mistral.configured ? '••••••••••••••••' : ''}">
+                        <button type="button" class="api-key-toggle" onclick="togglePasswordVisibility('mistralKey')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="api-key-description">
+                        Get your API key from <a href="https://console.mistral.ai/" target="_blank" class="api-key-link">Mistral AI Console</a>. 
+                        Fast and efficient models with competitive pricing.
+                    </div>
+                </div>
+                
+                <div class="api-key-group">
+                    <label>
+                        <i class="fas fa-home" style="color: #059669;"></i>
+                        Ollama Host URL
+                        <span class="api-key-status configured">Local Server</span>
+                    </label>
+                    <input type="text" id="ollamaHost" placeholder="${keys.ollama.placeholder}" 
+                           value="${keys.ollama.value}">
+                    <div class="api-key-description">
+                        Local Ollama server URL. Install <a href="https://ollama.ai/" target="_blank" class="api-key-link">Ollama</a> 
+                        for free, private AI models on your computer.
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-secondary btn-small" onclick="saveApiKeys()" style="flex: 1;">
+                        <i class="fas fa-save"></i> Save Keys
+                    </button>
+                    <button class="btn btn-secondary btn-small" onclick="toggleApiKeys()" style="flex: 1;">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Toggle API keys form
+        function toggleApiKeys() {
+            const form = document.getElementById('apiKeysForm');
+            const toggleText = document.getElementById('apiToggleText');
+            
+            if (form.classList.contains('active')) {
+                form.classList.remove('active');
+                toggleText.textContent = 'Manage API Keys';
+            } else {
+                form.classList.add('active');
+                toggleText.textContent = 'Hide API Keys';
+            }
+        }
+        
+        // Toggle password visibility
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+        
+        // Save API keys
+        async function saveApiKeys() {
+            const geminiKey = document.getElementById('geminiKey').value.trim();
+            const mistralKey = document.getElementById('mistralKey').value.trim();
+            const ollamaHost = document.getElementById('ollamaHost').value.trim();
+            
+            // Don't save if values are placeholder dots
+            const keys = {};
+            
+            if (geminiKey && !geminiKey.includes('••••')) {
+                keys.gemini = geminiKey;
+            }
+            
+            if (mistralKey && !mistralKey.includes('••••')) {
+                keys.mistral = mistralKey;
+            }
+            
+            if (ollamaHost) {
+                keys.ollama = ollamaHost;
+            }
+            
+            if (Object.keys(keys).length === 0) {
+                showError('No new API keys to save');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/api-keys', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ keys })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showStatus(`<i class="fas fa-check"></i> ${result.message}`, 'success');
+                    
+                    // Refresh API keys and providers
+                    await loadApiKeys();
+                    await loadProviders();
+                    
+                    // Hide form
+                    toggleApiKeys();
+                } else {
+                    showError('Failed to save API keys: ' + result.error);
+                }
+            } catch (error) {
+                showError('Failed to save API keys: ' + error.message);
+            }
+        }
+        
+        // Check for resumable generation
+        async function checkResumable() {
+            try {
+                const response = await fetch('/api/resumable');
+                const data = await response.json();
+                
+                if (data.resumable && data.generation) {
+                    showResumeOption(data.generation);
+                } else {
+                    hideResumeOption();
+                }
+            } catch (error) {
+                console.error('Failed to check resumable generation:', error);
+                hideResumeOption();
+            }
+        }
+        
+        // Show resume option
+        function showResumeOption(generation) {
+            const resumeSection = document.getElementById('resumeSection');
+            const resumeInfo = document.getElementById('resumeInfo');
+            
+            const progressText = generation.progress && generation.total_nodes ? 
+                `Progress: ${generation.progress}/${generation.total_nodes} sections completed` : 
+                'Partial progress available';
+            
+            resumeInfo.innerHTML = `
+                <div><strong>Topic:</strong> ${generation.topic}</div>
+                <div><strong>Profile:</strong> ${generation.profile}</div>
+                <div><strong>Model:</strong> ${generation.provider}/${generation.model}</div>
+                <div><strong>Error:</strong> ${generation.error}</div>
+                <div><strong>${progressText}</strong></div>
+                <div style="font-size: 0.8em; margin-top: 5px;">
+                    Failed on: ${new Date(generation.timestamp).toLocaleString()}
+                </div>
+            `;
+            
+            resumeSection.classList.add('active');
+            resumeSection.dataset.generationId = generation.id;
+        }
+        
+        // Hide resume option
+        function hideResumeOption() {
+            const resumeSection = document.getElementById('resumeSection');
+            resumeSection.classList.remove('active');
+        }
+        
+        // Resume generation
+        async function resumeGeneration() {
+            const resumeSection = document.getElementById('resumeSection');
+            const generationId = resumeSection.dataset.generationId;
+            
+            if (!generationId) {
+                showError('No generation ID found');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/resume', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        generation_id: generationId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Hide resume option and show progress
+                    hideResumeOption();
+                    setGenerationState(true);
+                    showStatus('Resuming generation from previous state...', 'info', 10);
+                    currentSessionId = result.session_id;
+                } else {
+                    showError('Failed to resume generation: ' + result.error);
+                }
+            } catch (error) {
+                showError('Failed to resume generation: ' + error.message);
+            }
+        }
+        
+        // Setup form validation
+        function setupFormValidation() {
+            const form = document.getElementById('generateForm');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!selectedProfile) {
+                    showError('Please select a generation profile');
+                    return;
+                }
+                
+                if (!selectedProvider) {
+                    showError('Please select an AI provider');
+                    return;
+                }
+                
+                const model = document.getElementById('model').value;
+                const topic = document.getElementById('topic').value.trim();
+                const maxDepth = document.getElementById('maxDepth').value;
+                const minLength = document.getElementById('minLength').value;
+                const maxIterations = document.getElementById('maxIterations').value;
+                
+                if (!model || !topic) {
+                    showError('Please fill in all required fields');
+                    return;
+                }
+                
+                if (topic.length < 5) {
+                    showError('Please provide a more detailed topic (at least 5 characters)');
+                    return;
+                }
+                
+                // Prepare custom settings
+                const customSettings = {};
+                if (maxDepth) customSettings.max_depth = parseInt(maxDepth);
+                if (minLength) customSettings.min_section_length = parseInt(minLength);
+                if (maxIterations) customSettings.max_iterations = parseInt(maxIterations);
+                
+                // Start generation
+                await startGeneration(selectedProvider.id, model, topic, selectedProfile.id, customSettings);
+            });
+            
+            // Stop button
+            document.getElementById('stopBtn').addEventListener('click', function() {
+                if (currentSessionId) {
+                    stopGeneration(currentSessionId);
+                }
+            });
+        }
+        
+        // Start generation
+        async function startGeneration(provider, model, topic, profile, settings) {
+            setGenerationState(true);
+            showStatus('Starting generation...', 'info', 5);
+            
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        provider,
+                        model,
+                        topic,
+                        profile,
+                        settings
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to start generation');
+                }
+                
+                currentSessionId = result.session_id;
+                
+            } catch (error) {
+                showError('Failed to start generation: ' + error.message);
+                setGenerationState(false);
+            }
+        }
+        
+        // Stop generation
+        async function stopGeneration(sessionId) {
+            try {
+                const response = await fetch(`/api/stop/${sessionId}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showStatus('Stopping generation...', 'warning', 0);
+                } else {
+                    showError('Failed to stop generation: ' + result.error);
+                }
+            } catch (error) {
+                showError('Failed to stop generation: ' + error.message);
+            }
+        }
+        
+        // Set generation state
+        function setGenerationState(generating) {
+            const generateBtn = document.getElementById('generateBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const form = document.getElementById('generateForm');
+            
+            if (generating) {
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+                stopBtn.style.display = 'block';
+                form.style.opacity = '0.7';
+            } else {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-rocket"></i> Generate Professional Notes';
+                stopBtn.style.display = 'none';
+                form.style.opacity = '1';
+                currentSessionId = null;
+            }
+        }
+        
+        // Show status message
+        function showStatus(message, type = 'info', progress = 0) {
+            const status = document.getElementById('status');
+            const statusMessage = document.getElementById('statusMessage');
+            const progressFill = document.getElementById('progressFill');
+            
+            status.className = `status active ${type}`;
+            statusMessage.innerHTML = message;
+            progressFill.style.width = progress + '%';
+        }
+        
+        // Show error message
+        function showError(message) {
+            showStatus(`<i class="fas fa-exclamation-triangle"></i> ${message}`, 'error');
+        }
+        
+        // Load generation history
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/history');
+                const data = await response.json();
+                generationHistory = data.history;
+                
+                document.getElementById('generationHistory').textContent = generationHistory.length;
+                renderHistory();
+            } catch (error) {
+                console.error('Failed to load history:', error);
+            }
+        }
+        
+        // Render history
+        function renderHistory() {
+            const historyList = document.getElementById('historyList');
+            
+            if (generationHistory.length === 0) {
+                historyList.innerHTML = '<p class="no-content">No notes generated yet</p>';
+                return;
+            }
+            
+            historyList.innerHTML = generationHistory.slice(-5).reverse().map(item => `
+                <div class="history-item">
+                    <div class="history-topic">${item.topic}</div>
+                    <div class="history-meta">
+                        ${item.profile || 'Unknown Profile'} • ${item.success ? 
+                            `${item.word_count?.toLocaleString() || 0} words • ${item.sections || 0} sections` :
+                            item.stopped ? 'Stopped by user' : 'Failed'
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Load active sessions
+        async function loadActiveSessions() {
+            try {
+                const response = await fetch('/api/active-sessions');
+                const data = await response.json();
+                activeSessions = data.sessions.reduce((acc, session) => {
+                    acc[session.id] = session;
+                    return acc;
+                }, {});
+                renderActiveSessions();
+            } catch (error) {
+                console.error('Failed to load active sessions:', error);
+            }
+        }
+        
+        // Render active sessions
+        function renderActiveSessions() {
+            const container = document.getElementById('activeSessions');
+            const sessions = Object.values(activeSessions);
+            
+            if (sessions.length === 0) {
+                container.innerHTML = '<p class="no-content">No active generations</p>';
+                return;
+            }
+            
+            container.innerHTML = sessions.map(session => `
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="session-topic">${session.topic}</div>
+                        <div class="session-meta">${session.profile} • ${session.provider}/${session.model} • ${session.status}</div>
+                    </div>
+                    <div class="session-progress">
+                        <div class="session-progress-fill" style="width: ${session.progress}%"></div>
+                    </div>
+                    <button class="btn btn-small btn-stop" onclick="stopGeneration('${session.id}')">
+                        <i class="fas fa-stop"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        // Load files
+        async function loadFiles() {
+            try {
+                const response = await fetch('/api/files');
+                const data = await response.json();
+                renderFiles(data.profiles || {});
+            } catch (error) {
+                console.error('Failed to load files:', error);
+            }
+        }
+        
+        // Render files
+        function renderFiles(profileFiles) {
+            const filesList = document.getElementById('filesList');
+            
+            if (Object.keys(profileFiles).length === 0) {
+                filesList.innerHTML = '<p class="no-content">No files yet</p>';
+                return;
+            }
+            
+            filesList.innerHTML = Object.entries(profileFiles).map(([profileName, topics]) => `
+                <div class="profile-group">
+                    <h4><i class="fas fa-user-graduate"></i> ${profileName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h4>
+                    ${Object.entries(topics).map(([topicName, files]) => `
+                        <div style="margin-left: 15px; margin-bottom: 15px;">
+                            <strong style="color: var(--text-primary); font-size: 0.9em;">${topicName}</strong>
+                            ${files.map(file => `
+                                <div class="file-item">
+                                    <div class="file-info">
+                                        <div class="file-name">${file.name}</div>
+                                        <div class="file-meta">${(file.size / 1024).toFixed(1)} KB • ${new Date(file.created).toLocaleDateString()}</div>
+                                    </div>
+                                    <div class="file-actions">
+                                        <button class="btn btn-small download-btn" onclick="downloadFile('${file.path}')">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+        
+        // Refresh files
+        function refreshFiles() {
+            loadFiles();
+        }
+        
+        // Download file
+        function downloadFile(path) {
+            window.open(`/api/download/${encodeURIComponent(path)}`, '_blank');
+        }
+        
+        // Socket.IO event handlers
+        socket.on('status', function(data) {
+            if (data.session_id === currentSessionId) {
+                const progress = data.progress || 50;
+                showStatus(`<i class="fas fa-cog fa-spin"></i> ${data.message}`, 'info', progress);
+            }
+        });
+        
+        socket.on('complete', function(data) {
+            if (data.session_id === currentSessionId) {
+                const resumedText = data.resumed ? ' (Resumed)' : '';
+                const message = `
+                    <div class="alert success">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h4>Notes Generated Successfully${resumedText}!</h4>
+                            <p><strong>📝 ${data.sections} sections</strong> • <strong>📊 ${data.word_count.toLocaleString()} words</strong> • <strong>⏱️ ${data.duration}</strong></p>
+                            <p>Profile: ${data.profile} • Model: ${data.model}</p>
+                            ${data.resumed ? '<p style="color: #059669; font-size: 0.9em;"><i class="fas fa-redo"></i> Successfully resumed from previous failed generation</p>' : ''}
+                            <button class="btn download-btn" onclick="downloadFile('${data.pdf_path}')" style="margin-top: 10px;">
+                                <i class="fas fa-download"></i> Download PDF
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                showStatus(message, 'success', 100);
+                setGenerationState(false);
+                
+                // Refresh data and check for new resumable generations
+                loadHistory();
+                loadFiles();
+                checkResumable();
+            }
+        });
+        
+        socket.on('stopped', function(data) {
+            if (data.session_id === currentSessionId) {
+                showStatus(`<i class="fas fa-stop-circle"></i> ${data.message}`, 'warning', 0);
+                setGenerationState(false);
+                
+                // Refresh data
+                loadHistory();
+                loadFiles();
+                checkResumable();
+            }
+        });
+        
+        socket.on('error', function(data) {
+            if (data.session_id === currentSessionId) {
+                showError(data.message);
+                setGenerationState(false);
+                
+                // Check if this error created a resumable generation
+                setTimeout(checkResumable, 1000);
+            }
+        });
+        
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

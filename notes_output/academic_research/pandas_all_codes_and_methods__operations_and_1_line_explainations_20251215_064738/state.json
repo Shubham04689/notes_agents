@@ -1,0 +1,487 @@
+{
+  "topic": "pandas all codes and methods , operations and 1 line explainations",
+  "model_name": "open-mistral-7b",
+  "outline": {
+    "topic": "Pandas: Comprehensive Guide to Codes, Methods, Operations, and One-Liners",
+    "chapters": [
+      {
+        "id": "ch1",
+        "title": "Introduction to Pandas",
+        "sections": [
+          {
+            "id": "ch1_s1",
+            "title": "Background and Motivation",
+            "subsections": [
+              {
+                "id": "ch1_s1_ss1",
+                "title": "History and Evolution",
+                "key_points": [
+                  "Introduction",
+                  "Origins",
+                  "Growth and Adoption",
+                  "Current State"
+                ]
+              },
+              {
+                "id": "ch1_s1_ss2",
+                "title": "Definitions and Fundamentals",
+                "key_points": [
+                  "DataFrames",
+                  "Series",
+                  "Index",
+                  "Columns"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ch1_s2",
+            "title": "Getting Started with Pandas",
+            "subsections": [
+              {
+                "id": "ch1_s2_ss1",
+                "title": "Installation and Import",
+                "key_points": [
+                  "Installation",
+                  "Importing Pandas"
+                ]
+              },
+              {
+                "id": "ch1_s2_ss2",
+                "title": "Creating DataFrames",
+                "key_points": [
+                  "Creating from Scratch",
+                  "Creating from Structured Data",
+                  "Creating from Dictionaries"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ch2",
+        "title": "Data Manipulation and Cleaning",
+        "sections": [
+          {
+            "id": "ch2_s1",
+            "title": "Basic Operations",
+            "subsections": [
+              {
+                "id": "ch2_s1_ss1",
+                "title": "Accessing Data",
+                "key_points": [
+                  "Accessing Elements",
+                  "Accessing Rows and Columns"
+                ]
+              },
+              {
+                "id": "ch2_s1_ss2",
+                "title": "Manipulating Data",
+                "key_points": [
+                  "Adding and Deleting Rows",
+                  "Adding and Deleting Columns",
+                  "Renaming Columns and Indexes"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ch2_s2",
+            "title": "Data Cleaning and Preprocessing",
+            "subsections": [
+              {
+                "id": "ch2_s2_ss1",
+                "title": "Handling Missing Data",
+                "key_points": [
+                  "Filling Missing Data",
+                  "Dealing with Duplicates"
+                ]
+              },
+              {
+                "id": "ch2_s2_ss2",
+                "title": "Data Transformation",
+                "key_points": [
+                  "Converting Data Types",
+                  "Data Aggregation"
+                ]
+              },
+              {
+                "id": "ch2_s2_ss3",
+                "title": "Merging and Joining Data",
+                "key_points": [
+                  "Inner Join",
+                  "Outer Join",
+                  "Merging Multiple DataFrames"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ch3",
+        "title": "Data Analysis and Visualization",
+        "sections": [
+          {
+            "id": "ch3_s1",
+            "title": "Statistical Analysis",
+            "subsections": [
+              {
+                "id": "ch3_s1_ss1",
+                "title": "Descriptive Statistics",
+                "key_points": [
+                  "Mean",
+                  "Median",
+                  "Mode",
+                  "Standard Deviation",
+                  "Variance"
+                ]
+              },
+              {
+                "id": "ch3_s1_ss2",
+                "title": "Correlation and Regression",
+                "key_points": [
+                  "Pearson Correlation",
+                  "Spearman Rank Correlation",
+                  "Linear Regression"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ch3_s2",
+            "title": "Data Visualization",
+            "subsections": [
+              {
+                "id": "ch3_s2_ss1",
+                "title": "Basic Plots",
+                "key_points": [
+                  "Line Plots",
+                  "Bar Plots",
+                  "Scatter Plots"
+                ]
+              },
+              {
+                "id": "ch3_s2_ss2",
+                "title": "Advanced Visualizations",
+                "key_points": [
+                  "Heatmaps",
+                  "Pie Charts",
+                  "Box Plots"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ch4",
+        "title": "Performance and Optimization",
+        "sections": [
+          {
+            "id": "ch4_s1",
+            "title": "Performance Considerations",
+            "subsections": [
+              {
+                "id": "ch4_s1_ss1",
+                "title": "Understanding Performance Bottlenecks",
+                "key_points": [
+                  "Common Causes",
+                  "Identifying Issues"
+                ]
+              },
+              {
+                "id": "ch4_s1_ss2",
+                "title": "Optimizing Performance",
+                "key_points": [
+                  "Choosing the Right DataStructure",
+                  "Avoiding Multiple Operations",
+                  "Optimizing Memory Usage"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ch4_s2",
+            "title": "Parallelization and Scaling",
+            "subsections": [
+              {
+                "id": "ch4_s2_ss1",
+                "title": "Parallel Processing",
+                "key_points": [
+                  "Parallelizing Operations",
+                  "Using Multi-core Processors"
+                ]
+              },
+              {
+                "id": "ch4_s2_ss2",
+                "title": "Scaling with Distributed Systems",
+                "key_points": [
+                  "Hadoop",
+                  "Spark",
+                  "Google Cloud Dataflow"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ch5",
+        "title": "Advanced Topics and Best Practices",
+        "sections": [
+          {
+            "id": "ch5_s1",
+            "title": "Advanced Data Structures",
+            "subsections": [
+              {
+                "id": "ch5_s1_ss1",
+                "title": "MultiIndex",
+                "key_points": [
+                  "Creating MultiIndex",
+                  "Using MultiIndex"
+                ]
+              },
+              {
+                "id": "ch5_s1_ss2",
+                "title": "Panel Object",
+                "key_points": [
+                  "Creating Panel Object",
+                  "Using Panel Object"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ch5_s2",
+            "title": "Working with Large Datasets",
+            "subsections": [
+              {
+                "id": "ch5_s2_ss1",
+                "title": "Chunking and Iterating",
+                "key_points": [
+                  "Chunking Data",
+                  "Iterating Over Data"
+                ]
+              },
+              {
+                "id": "ch5_s2_ss2",
+                "title": "Using Lazy Computation",
+                "key_points": [
+                  "Understanding Lazy Computation",
+                  "Using Lazy Computation"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ch5_s3",
+            "title": "Debugging and Troubleshooting",
+            "subsections": [
+              {
+                "id": "ch5_s3_ss1",
+                "title": "Identifying Errors",
+                "key_points": [
+                  "Common Errors",
+                  "Debugging Techniques"
+                ]
+              },
+              {
+                "id": "ch5_s3_ss2",
+                "title": "Asking for Help",
+                "key_points": [
+                  "Stack Overflow",
+                  "Pandas Github",
+                  "Pandas Community"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ch5_s4",
+            "title": "Best Practices and Methodologies",
+            "subsections": [
+              {
+                "id": "ch5_s4_ss1",
+                "title": "Code Organization",
+                "key_points": [
+                  "Writing Reusable Functions",
+                  "Modularizing Code",
+                  "Documenting Code"
+                ]
+              },
+              {
+                "id": "ch5_s4_ss2",
+                "title": "Testing and Validating",
+                "key_points": [
+                  "Unit Testing",
+                  "Integration Testing",
+                  "Validating Results"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ch6",
+        "title": "Real-World Case Studies",
+        "sections": [
+          {
+            "id": "ch6_s1",
+            "title": "Financial Analysis",
+            "subsections": [
+              {
+                "id": "ch6_s1_ss1",
+                "title": "Stock Market Analysis",
+                "key_points": [
+                  "Analyzing Stock Data",
+                  "Building Portfolio"
+                ]
+              },
+              {
+                "id": "ch6_s1_ss2",
+                "title": "Financial Risk Management",
+                "key_points": [
+                  "Risk Analysis",
+                  "Portfolio Optimization"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ch6_s2",
+            "title": "Data Science Projects",
+            "subsections": [
+              {
+                "id": "ch6_s2_ss1",
+                "title": "Sentiment Analysis",
+                "key_points": [
+                  "Text Preprocessing",
+                  "Building Sentiment Models"
+                ]
+              },
+              {
+                "id": "ch6_s2_ss2",
+                "title": "Churn Prediction",
+                "key_points": [
+                  "Data Preprocessing",
+                  "Building Predictive Models"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "covered_nodes": [
+    "ch1",
+    "ch1_s1",
+    "ch1_s1_ss1",
+    "ch1_s1_ss2",
+    "ch1_s2",
+    "ch1_s2_ss1",
+    "ch1_s2_ss2",
+    "ch2",
+    "ch2_s1",
+    "ch2_s1_ss1",
+    "ch2_s1_ss2",
+    "ch2_s2",
+    "ch2_s2_ss1",
+    "ch2_s2_ss2",
+    "ch2_s2_ss3",
+    "ch3",
+    "ch3_s1",
+    "ch3_s1_ss1",
+    "ch3_s1_ss2",
+    "ch3_s2",
+    "ch3_s2_ss1",
+    "ch3_s2_ss2",
+    "ch4",
+    "ch4_s1",
+    "ch4_s1_ss1",
+    "ch4_s1_ss2",
+    "ch4_s2",
+    "ch4_s2_ss1",
+    "ch4_s2_ss2",
+    "ch5",
+    "ch5_s1",
+    "ch5_s1_ss1",
+    "ch5_s1_ss2",
+    "ch5_s2",
+    "ch5_s2_ss1",
+    "ch5_s2_ss2",
+    "ch5_s3",
+    "ch5_s3_ss1",
+    "ch5_s3_ss2",
+    "ch5_s4",
+    "ch5_s4_ss1",
+    "ch5_s4_ss2",
+    "ch6",
+    "ch6_s1",
+    "ch6_s1_ss1",
+    "ch6_s1_ss2",
+    "ch6_s2",
+    "ch6_s2_ss1",
+    "ch6_s2_ss2"
+  ],
+  "pending_nodes": [],
+  "covered_topics": [
+    "Introduction to Pandas",
+    "Background and Motivation",
+    "History and Evolution",
+    "Definitions and Fundamentals",
+    "Getting Started with Pandas",
+    "Installation and Import",
+    "Creating DataFrames",
+    "Data Manipulation and Cleaning",
+    "Basic Operations",
+    "Accessing Data",
+    "Manipulating Data",
+    "Data Cleaning and Preprocessing",
+    "Handling Missing Data",
+    "Data Transformation",
+    "Merging and Joining Data",
+    "Data Analysis and Visualization",
+    "Statistical Analysis",
+    "Descriptive Statistics",
+    "Correlation and Regression",
+    "Data Visualization",
+    "Basic Plots",
+    "Advanced Visualizations",
+    "Performance and Optimization",
+    "Performance Considerations",
+    "Understanding Performance Bottlenecks",
+    "Optimizing Performance",
+    "Parallelization and Scaling",
+    "Parallel Processing",
+    "Scaling with Distributed Systems",
+    "Advanced Topics and Best Practices",
+    "Advanced Data Structures",
+    "MultiIndex",
+    "Panel Object",
+    "Working with Large Datasets",
+    "Chunking and Iterating",
+    "Using Lazy Computation",
+    "Debugging and Troubleshooting",
+    "Identifying Errors",
+    "Asking for Help",
+    "Best Practices and Methodologies",
+    "Code Organization",
+    "Testing and Validating",
+    "Real-World Case Studies",
+    "Financial Analysis",
+    "Stock Market Analysis",
+    "Financial Risk Management",
+    "Data Science Projects",
+    "Sentiment Analysis",
+    "Churn Prediction"
+  ],
+  "total_word_count": 28109,
+  "created_at": "2025-12-15T06:48:14.275511",
+  "updated_at": "2025-12-15T07:04:36.448464",
+  "status": "complete",
+  "completed_at": "2025-12-15T07:04:38.050027"
+}

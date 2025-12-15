@@ -1,0 +1,21 @@
+app:
+  name: "AI Note Generator"
+  version: "1.0.0"
+  
+storage:
+  base_dir: "./generated_notes"
+  state_file: "session_state.json"
+  
+generation:
+  max_depth: 5
+  min_section_length: 500
+  max_iterations: 100
+  expansion_threshold: 0.8
+  
+pdf:
+  title_font_size: 24
+  chapter_font_size: 18
+  section_font_size: 14
+  body_font_size: 11
+  line_spacing: 1.5
+  margin: 72
