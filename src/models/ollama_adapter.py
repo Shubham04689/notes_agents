@@ -1,5 +1,6 @@
 import requests
 from typing import List, Optional
+import os
 from .base import BaseModelAdapter
 
 
@@ -51,7 +52,7 @@ class OllamaAdapter(BaseModelAdapter):
             response = requests.post(
                 f"{self.api_url}/generate",
                 json=payload,
-                timeout=300
+                timeout=int(os.environ.get('OLLAMA_TIMEOUT', 1200))
             )
             response.raise_for_status()
             return response.json()['response']
